@@ -102,11 +102,66 @@ def redraw_start_menu():
 
 
 #----------------MAIN MENU WINDOW SETUP---------------
-main_menu_bg = pygame.image.load(os.path.join("images","rha_intro.JPG"))
+main_menu_bg = pygame.image.load(os.path.join("images","rha_intro3.JPG"))
 main_menu_bg = pygame.transform.scale(main_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
+
+img_power_on = pygame.image.load(os.path.join("images","rha_power_on.PNG"))
+w,h = img_power_on.get_size()
+a = w/h      #aspect ratio
+img_power_on = pygame.transform.scale(img_power_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
+
+img_power_off = pygame.image.load(os.path.join("images","rha_power_off2.PNG"))
+w,h = img_power_off.get_size()
+a = w/h      #aspect ratio
+img_power_off = pygame.transform.scale(img_power_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
+
+img_keyboard_on = pygame.image.load(os.path.join("images","rha_keyboard_on2.PNG"))
+w,h = img_keyboard_on.get_size()
+a = w/h      #aspect ratio
+img_keyboard_on = pygame.transform.scale(img_keyboard_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
+
+img_keyboard_off = pygame.image.load(os.path.join("images","rha_keyboard_off2.PNG"))
+w,h = img_keyboard_off.get_size()
+a = w/h      #aspect ratio
+img_keyboard_off = pygame.transform.scale(img_keyboard_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
+
+img_cmd_on = pygame.image.load(os.path.join("images","rha_cmd_on.PNG"))
+w,h = img_cmd_on.get_size()
+a = w/h      #aspect ratio
+img_cmd_on = pygame.transform.scale(img_cmd_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
+
+img_cmd_off = pygame.image.load(os.path.join("images","rha_cmd_off.PNG"))
+w,h = img_cmd_off.get_size()
+a = w/h      #aspect ratio
+img_cmd_off = pygame.transform.scale(img_cmd_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
+
+# text2 = ["Power","One Click equals 2 seconds", "Press & Hold for longer time"\
+#         "Real Time Keyboard", "Click to Toggle"\
+#         "Paste and Send","Click to Toggle","Send long strings (500 char)"]
+
+# font_size, bold, text_color, bg_color = 20, True, (0,0,255), (255,255,255)
+# txt_0 = create_text(text[0], font_size, bold, text_color, bg_color)
+# x_txt_0, y_txt_0 = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
+
+# font_size, bold, text_color, bg_color = 12, False, (0,0,0), (255,255,255)
+# txt_1 = create_text(text[1], font_size, bold, text_color, bg_color)
+# x_txt_1, y_txt_1 = 0.3*WINDOW_SIZE, 0.43*WINDOW_SIZE
+
+# font_size, bold, text_color, bg_color = 20, True, (0,0,255), (255,255,255)
+# txt_2 = create_text(text[2], font_size, bold, text_color, bg_color)
+# x_txt_2, y_txt_2 = 0.3*WINDOW_SIZE, 0.54*WINDOW_SIZE
+
+x,y,w,y = 
+thickness, color = 10, (0,0,255)
+rectPower = pygame.Rect(x,y,w,y)  
+pygame.draw.rect(surface, color, rectPower, width=thickness)
+
 
 def redraw_main_menu():  
     win.blit(main_menu_bg, (0,0))  # This will draw our background image at (0,0)
+    win.blit(img_power_on, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
+    win.blit(img_keyboard_on, (3/12*WINDOW_SIZE,5.5/12*WINDOW_SIZE)) 
+    win.blit(img_cmd_on, (3/12*WINDOW_SIZE,8/12*WINDOW_SIZE))    
     pygame.display.update() 
 
 
