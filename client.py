@@ -63,6 +63,7 @@ BOX_THICKNESS = 3
 BLUE = (0,0,255)  
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+BOLD = True
 
 # Create Window Display 
 pygame.init()                      
@@ -76,24 +77,19 @@ start_menu_bg = pygame.transform.scale(start_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
 
 text = ["Welcome","Click Anywhere to Start", "Remote Access", "by", "Laygond"]
 
-font_size, bold = 20, True
-txt_0 = create_text(text[0], font_size, bold, BLUE)
+txt_0 = create_text(text[0], 20, BOLD, BLUE)
 x_txt_0, y_txt_0 = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
 
-font_size, bold = 12, False
-txt_1 = create_text(text[1], font_size, bold, BLACK)
+txt_1 = create_text(text[1], 12, not BOLD, BLACK)
 x_txt_1, y_txt_1 = 0.3*WINDOW_SIZE, 0.43*WINDOW_SIZE
 
-font_size, bold = 20, True
-txt_2 = create_text(text[2], font_size, bold, BLUE)
+txt_2 = create_text(text[2], 20, BOLD, BLUE)
 x_txt_2, y_txt_2 = 0.3*WINDOW_SIZE, 0.54*WINDOW_SIZE
 
-font_size, bold = 11, False
-txt_3 = create_text(text[3], font_size, bold, BLUE)
+txt_3 = create_text(text[3], 11, not BOLD, BLUE)
 x_txt_3, y_txt_3 = 0.59*WINDOW_SIZE, 0.6*WINDOW_SIZE
 
-font_size, bold = 11,True
-txt_4 = create_text(text[4], font_size, bold, BLUE)
+txt_4 = create_text(text[4], 11, BOLD, BLUE)
 x_txt_4, y_txt_4 = 0.59*WINDOW_SIZE, 0.625*WINDOW_SIZE
 
 def redraw_start_menu():  
@@ -140,7 +136,7 @@ w,h = img_cmd_off.get_size()
 a = w/h      #aspect ratio
 img_cmd_off = pygame.transform.scale(img_cmd_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-# text2 = ["Power","One Click equals 2 seconds", "Press & Hold for longer time"\
+# text2 = ["Real Time Power Switch","One Click equals 2 seconds", "Press & Hold for longer time"\
 #         "Real Time Keyboard", "Click to Toggle"\
 #         "Paste and Send","Click to Toggle","Send long strings (500 char)"\
 #         "© 2020 Laygond Github, Remote Hardware Access"]
@@ -159,13 +155,25 @@ mouse_click = False
 click_power = False
 click_keyboard = False
 click_cmd = False
-
+hold_power = False
+timer_start = 0
 
 def redraw_main_menu():  
     win.blit(main_menu_bg, (0,0))  # This will draw our background image at (0,0)
     
+    #    elapse = time.time()-timer if time.time()-timer < 60 else 0 
     if click_power:
         win.blit(img_power_on, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
+        txt_0 = create_text("Processing...", 18, BOLD, WHITE)
+        x_txt_0, y_txt_0 = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
+        win.blit(txt_0, (x_txt_0, y_txt_0)) 
+    elif hold_power:
+        win.blit(img_power_on, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
+        timer_disp = int((time.time()- timer_start)*100)/100.0
+        print(timer_disp)
+        txt_0 = create_text(str(timer_disp)+" seconds", 20, BOLD, WHITE)
+        x_txt_0, y_txt_0 = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
+        win.blit(txt_0, (x_txt_0, y_txt_0))  
     else:
         win.blit(img_power_off, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
 
@@ -188,7 +196,7 @@ def redraw_main_menu():
 
     pygame.display.update() 
 
-timer = 0
+
 run = True
 start_menu = True 
 while run:
@@ -216,32 +224,42 @@ while run:
     #------------------MAIN MENU--------------
     mouse_pos = pygame.mouse.get_pos()
     events = pygame.event.get()
-    elapse = time.time()-timer if time.time()-timer < 60 else 0 
-    print(elapse)
     for event in events:
         #If red X from window is clicked
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+        #If power option is pressed then start timer
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if rectPower.collidepoint(mouse_pos):
-                timer = time.time()
-                click_power = True
+                timer_start = time.time()
+                hold_power = True  
+                click_power = False
                 click_keyboard = False
                 click_cmd = False
-
         # if mouse is clicked over options
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            timer = 0
-            click_power = False 
-            if rectKeyboard.collidepoint(mouse_pos):
-                click_power = False
-                click_keyboard = False if click_keyboard else True
-                click_cmd = False
-            elif rectCmd.collidepoint(mouse_pos):
-                click_power = False
+            hold_power = False
+            if rectPower.collidepoint(mouse_pos):
+                timer_end = time.time() - timer_start
+                if timer_end <0.7:      # click threshold in seconds 
+                    click_power = True  # will be turned off after 2.5 seconds
                 click_keyboard = False
-                click_cmd = False if click_cmd else True
+                click_cmd = False
+            if not click_power: # cannot change option while powering on
+                if rectKeyboard.collidepoint(mouse_pos):
+                    click_power = False
+                    click_keyboard = False if click_keyboard else True
+                    click_cmd = False
+                elif rectCmd.collidepoint(mouse_pos):
+                    click_power = False
+                    click_keyboard = False
+                    click_cmd = False if click_cmd else True
+
+    #Turn off power click option after 2.5 seconds
+    if click_power:
+        if time.time()- timer_start > 2.5:
+            click_power = False
 
     # If mouse over options then display box
     if rectPower.collidepoint(mouse_pos):
