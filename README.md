@@ -23,4 +23,9 @@ Install ...
 Install ...
 
 
-
+##### Keywords
+* Sending Data from Raspberri Pi to PC
+* USB Serial comunnication
+* Remote Access
+* Menu option in Pygame
+* Socket Client & Sever
