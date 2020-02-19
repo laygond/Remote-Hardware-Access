@@ -1,69 +1,39 @@
 import pickle
-
-import socket, traceback
-import csv
+import socket
 import time
-import wave
 import struct
-import math
 import os
-import numpy as np
-
 import pygame
-from pygame.locals import *             #This enhances all keybord inputs
-import pygame.freetype
-from pygame.sprite import Sprite
-from pygame.rect import Rect
+from pygame.locals import *      #Enhances keybord inputs "apparently"
 
-
-import threading
-
-# HEADERSIZE  = 10
-# SERVER_IP   = socket.gethostname()
-# SERVER_port = 1243
-
-
-# client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-# client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-# client_socket.connect((SERVER_IP, SERVER_port))
-
-# while True:
-#     full_msg = b''
-#     new_msg = True
-#     while True:
-#         msg = s.recv(16)
-#         if new_msg:
-#             print("new msg len:",msg[:HEADERSIZE])
-#             msglen = int(msg[:HEADERSIZE])
-#             new_msg = False
-
-#         print(f"full message length: {msglen}")
-
-#         full_msg += msg
-
-#         print(len(full_msg))
-
-#         if len(full_msg)-HEADERSIZE == msglen:
-#             print("full msg recvd")
-#             print(full_msg[HEADERSIZE:])
-#             print(pickle.loads(full_msg[HEADERSIZE:]))
-#             new_msg = True
-#             full_msg = b""
 
 def create_text(text, font_size, bold, text_color):
-    """ Returns surface with text written on """
+    """ 
+    Used in pygame's window. Returns surface (pygame's image)
+    with text written on
+    """
     myfont = pygame.font.SysFont("Courier", font_size, bold)
     surface =  myfont.render(text,True,text_color)
     return surface 
 
-# --------- CONSTANTS --------
-WINDOW_SIZE= 400  
+
+# ---------------- CONSTANTS -------------------
+WINDOW_SIZE = 400  
 BOX_THICKNESS = 3
-BLUE = (0,0,255)  
+BLUE  = (0,0,255)  
 BLACK = (0,0,0)
 WHITE = (255,255,255)
-BOLD = True
+BOLD  = True
+HEADERSIZE  = 10        # pre-allocates in header the length of msg: max (10 digit number)
+SERVER_IP   = socket.gethostname()
+SERVER_port = 1243
+
+
+# ---------------- INITIAL SETUP -----------------
+# Create Client
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((SERVER_IP, SERVER_port))
+#client_socket.setblocking(False)       # so .recv() call is not blocked
 
 # Create Window Display 
 pygame.init()                      
@@ -71,7 +41,7 @@ win = pygame.display.set_mode((WINDOW_SIZE,WINDOW_SIZE))
 pygame.display.set_caption("Remote Hardware Access")
 
 
-#----------------START MENU WINDOW SETUP---------------
+#--------------- START MENU WINDOW SETUP------------
 start_menu_bg = pygame.image.load(os.path.join("images","rha_intro2.PNG"))
 start_menu_bg = pygame.transform.scale(start_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
 
@@ -131,7 +101,7 @@ w,h = img_cmd_on.get_size()
 a = w/h      #aspect ratio
 img_cmd_on = pygame.transform.scale(img_cmd_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-img_cmd_off = pygame.image.load(os.path.join("images","rha_cmd_off.PNG"))
+img_cmd_off = pygame.image.load(os.path.join("images","rha_cmd_off2.PNG"))
 w,h = img_cmd_off.get_size()
 a = w/h      #aspect ratio
 img_cmd_off = pygame.transform.scale(img_cmd_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
@@ -157,23 +127,23 @@ click_keyboard = False
 click_cmd = False
 hold_power = False
 timer_start = 0
+key_pressed = False
 
 def redraw_main_menu():  
     win.blit(main_menu_bg, (0,0))  # This will draw our background image at (0,0)
     
-    #    elapse = time.time()-timer if time.time()-timer < 60 else 0 
     if click_power:
         win.blit(img_power_on, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
-        txt_0 = create_text("Processing...", 18, BOLD, WHITE)
-        x_txt_0, y_txt_0 = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
-        win.blit(txt_0, (x_txt_0, y_txt_0)) 
+        txt = create_text("Processing...", 18, BOLD, WHITE)
+        x_txt, y_txt = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
+        win.blit(txt, (x_txt, y_txt)) 
     elif hold_power:
         win.blit(img_power_on, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
         timer_disp = int((time.time()- timer_start)*100)/100.0
         print(timer_disp)
-        txt_0 = create_text(str(timer_disp)+" seconds", 20, BOLD, WHITE)
-        x_txt_0, y_txt_0 = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
-        win.blit(txt_0, (x_txt_0, y_txt_0))  
+        txt = create_text(str(timer_disp)+" seconds", 20, BOLD, WHITE)
+        x_txt, y_txt = 0.4*WINDOW_SIZE, 0.35*WINDOW_SIZE
+        win.blit(txt, (x_txt, y_txt))  
     else:
         win.blit(img_power_off, (3/12*WINDOW_SIZE,3/12*WINDOW_SIZE))
 
@@ -197,31 +167,26 @@ def redraw_main_menu():
     pygame.display.update() 
 
 
+# ------------- MAIN CODE STARTS HERE -------------
 run = True
 start_menu = True 
 while run:
     pygame.time.delay(100)
 
-    #----------------START MENU---------------
+    #------------START MENU-----------
     while start_menu:
-        events = pygame.event.get()
+        events = pygame.event.get()     #Collects Keyboard & Mouse Events 
         for event in events:
             #If red X from window is clicked
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
             #If mouse is clicked anywhere proceed to MAIN MENU
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 start_menu = False
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     if event.button ==1:
-            #         start_menu = False
-
         redraw_start_menu()
 
-
-    #------------------MAIN MENU--------------
+    #------------MAIN MENU-------------
     mouse_pos = pygame.mouse.get_pos()
     events = pygame.event.get()
     for event in events:
@@ -231,7 +196,7 @@ while run:
             quit()
         #If power option is pressed then start timer
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if rectPower.collidepoint(mouse_pos):
+            if rectPower.collidepoint(mouse_pos):   # if mouse within rect
                 timer_start = time.time()
                 hold_power = True  
                 click_power = False
@@ -239,7 +204,7 @@ while run:
                 click_cmd = False
         # if mouse is clicked over options
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            hold_power = False
+            hold_power = False          # Power has been released
             if rectPower.collidepoint(mouse_pos):
                 timer_end = time.time() - timer_start
                 if timer_end <0.7:      # click threshold in seconds 
@@ -249,17 +214,29 @@ while run:
             if not click_power: # cannot change option while powering on
                 if rectKeyboard.collidepoint(mouse_pos):
                     click_power = False
-                    click_keyboard = False if click_keyboard else True
+                    click_keyboard = False if click_keyboard else True  #Toggle option
                     click_cmd = False
                 elif rectCmd.collidepoint(mouse_pos):
                     click_power = False
                     click_keyboard = False
                     click_cmd = False if click_cmd else True
+        # If keyboard is pressed
+        if event.type == pygame.KEYDOWN:
+            key_pressed = True
 
-    #Turn off power click option after 2.5 seconds
+    # Turn off power click option after 2.5 seconds
     if click_power:
         if time.time()- timer_start > 2.5:
             click_power = False
+
+    # If keyboard is selected and keys are pressed 
+    if click_keyboard and key_pressed:
+        keys = pygame.key.get_pressed()
+        msg = pickle.dumps(keys)
+        msg = bytes(f"{len(msg):<{HEADERSIZE}}", 'utf-8')+msg
+        print(msg)
+        client_socket.send(msg)
+        key_pressed = False
 
     # If mouse over options then display box
     if rectPower.collidepoint(mouse_pos):
@@ -275,51 +252,6 @@ while run:
     else: 
         mouse_over_cmd = False
 
-
-    # if rectPower.collidepoint(pygame.mouse.get_pos()):
-    #     mouse_over_power = True
-    #     if mouse_click:
-    #         click_power = True
-    #         mouse_click = False
-    # else: 
-    #     mouse_over_power = False
-    
-    # if rectKeyboard.collidepoint(pygame.mouse.get_pos()):
-    #     mouse_over_keyboard = True
-    #     if mouse_click:
-    #         click_keyboard = True
-    #         mouse_click = False
-    # else: 
-    #     mouse_over_keyboard = False
-    
-    # if rectCmd.collidepoint(pygame.mouse.get_pos()):
-    #     mouse_over_cmd = True
-    #     if mouse_click:
-    #         click_cmd = True
-    #         mouse_click = False
-    # else: 
-    #     mouse_over_cmd = False
-
     redraw_main_menu()
-        
-        
-    #     if event.type == pygame.KEYDOWN: 
-    #         keys = pygame.key.get_pressed()
-    #         print(keys)
-
-
-    
-    # if keys[pygame.K_LEFT]:
-    #     x -= vel
-    # win.fill((0,0,0))  # Fills the screen with black
-    #pygame.draw.rect(win, (255,0,0), (x, y, width, height))   
-    #pygame.display.update() 
     
 pygame.quit()
-
-# while True:
-#     #************************** READ KEYBOARD DATA ****************************
-#     events = pygame.event.get()
-#     for event in events:
-#         if event.type == pygame.KEYDOWN:
-#             print(event.key) 

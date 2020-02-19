@@ -2,24 +2,44 @@ import socket
 import time
 import pickle
 
+HEADERSIZE  = 10        # pre-allocates in header the length of msg: max (10 digit number)
+CLIENT_IP   = socket.gethostname()
+CLIENT_port = 1243
 
-HEADERSIZE = 10
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((socket.gethostname(), 1243))
-s.listen(5)
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+# server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+server_socket.bind((CLIENT_IP, CLIENT_port))
+server_socket.listen(5)
+print(f'Listening for connections on {CLIENT_IP}:{CLIENT_port}...')
 
 while True:
-    # now our endpoint knows about the OTHER endpoint.
-    clientsocket, address = s.accept()
-    print(f"Connection from {address} has been established.")
+    try:
+        # now our endpoint knows about the OTHER endpoint.
+        client_socket, address = server_socket.accept()      #freezes here until connection 
+        print(f"Connection from {address} has been established.")
 
-    d = {1:"hi", 2: "there"}
-    msg = pickle.dumps(d)
-    msg = bytes(f"{len(msg):<{HEADERSIZE}}", 'utf-8')+msg
-    print(msg)
-    clientsocket.send(msg)
+        full_msg = b''
+        new_msg = True
+        while True:
+            msg = client_socket.recv(512)   #freezes here until it receives from client
+            if new_msg:
+                print("new msg len:",msg[:HEADERSIZE])
+                msglen = int(msg[:HEADERSIZE])
+                new_msg = False
 
+            full_msg += msg
+            #print(len(full_msg)-HEADERSIZE)
+
+            if len(full_msg)-HEADERSIZE == msglen:
+                print("full msg recvd")
+                print(full_msg[HEADERSIZE:])
+                print(pickle.loads(full_msg[HEADERSIZE:]))
+                new_msg = True
+                full_msg = b""
+
+    except:
+        pass
 
 # import socket
 # import time
