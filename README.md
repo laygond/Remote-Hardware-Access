@@ -29,3 +29,4 @@ Install ...
 * Remote Access
 * Menu option in Pygame
 * Socket Client & Sever
+* Device Tree Overlays
