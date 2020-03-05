@@ -2,22 +2,22 @@ import socket
 import time
 import pickle
 
-HEADERSIZE  = 10        # pre-allocates in header the length of msg: max (10 digit number)
-CLIENT_IP   = socket.gethostname()
-CLIENT_port = 1243
+HEADERSIZE = 10        # pre-allocates in header the length of msg: max (10 digit number)
+CLIENT_IP  = socket.gethostname()
+PORT       = 1243      # (+1000 Recommended) Must match with client port
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-server_socket.bind((CLIENT_IP, CLIENT_port))
+server_socket.bind((CLIENT_IP, PORT))
 server_socket.listen(5)
-print(f'Listening for connections on {CLIENT_IP}:{CLIENT_port}...')
+print(f'Listening for connections on {CLIENT_IP}:{PORT}...')
 
 while True:
     try:
         # now our endpoint knows about the OTHER endpoint.
         client_socket, address = server_socket.accept()      #freezes here until connection 
-        print(f"Connection from {address} has been established.")
+        print(f"Connection from Client: {address} has been established.")
 
         full_msg = b''
         new_msg = True
