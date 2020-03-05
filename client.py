@@ -25,7 +25,7 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 BOLD  = True
 HEADERSIZE = 10        # pre-allocates in header the length of msg: max (10 digit number)
-SERVER_IP  = socket.gethostname()
+SERVER_IP  = "10.0.0.7"#socket.gethostname()
 PORT       = 1243      # (+1000 Recommended) Must match with server port
 
 

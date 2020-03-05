@@ -3,15 +3,15 @@ import time
 import pickle
 
 HEADERSIZE = 10        # pre-allocates in header the length of msg: max (10 digit number)
-CLIENT_IP  = socket.gethostname()
+SERVER_IP  = socket.gethostname()
 PORT       = 1243      # (+1000 Recommended) Must match with client port
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-server_socket.bind((CLIENT_IP, PORT))
+server_socket.bind((SERVER_IP, PORT))  # notifies os that it's going to use given IP and port.For a server using IP 0.0.0.0 means to listen on all available interfaces, useful to connect locally to 127.0.0.1 and remotely to LAN interface IP
 server_socket.listen(5)
-print(f'Listening for connections on {CLIENT_IP}:{PORT}...')
+print(f'Listening for connections on Server {SERVER_IP}:{PORT}...')
 
 while True:
     try:
