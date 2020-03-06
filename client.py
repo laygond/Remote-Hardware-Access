@@ -40,11 +40,13 @@ pygame.init()
 win = pygame.display.set_mode((WINDOW_SIZE,WINDOW_SIZE))  
 pygame.display.set_caption("Remote Hardware Access")
 
-
+# There are two levels in our display program: the start menu & the main menu
 #--------------- START MENU WINDOW SETUP------------
+# Load Images 
 start_menu_bg = pygame.image.load(os.path.join("images","rha_intro2.PNG"))
 start_menu_bg = pygame.transform.scale(start_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
 
+# Load Texts
 text = ["Welcome","Click Anywhere to Start", "Remote Access", "by", "Laygond"]
 
 txt_0 = create_text(text[0], 20, BOLD, BLUE)
@@ -62,6 +64,7 @@ x_txt_3, y_txt_3 = 0.59*WINDOW_SIZE, 0.6*WINDOW_SIZE
 txt_4 = create_text(text[4], 11, BOLD, BLUE)
 x_txt_4, y_txt_4 = 0.59*WINDOW_SIZE, 0.625*WINDOW_SIZE
 
+# Draw Images and Texts 
 def redraw_start_menu():  
     win.blit(start_menu_bg, (0,0))  # This will draw our background image at (0,0)
     win.blit(txt_0, (x_txt_0, y_txt_0))
@@ -73,6 +76,7 @@ def redraw_start_menu():
 
 
 #----------------MAIN MENU WINDOW SETUP---------------
+# Load Images
 main_menu_bg = pygame.image.load(os.path.join("images","rha_intro3.JPG"))
 main_menu_bg = pygame.transform.scale(main_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
 
@@ -111,6 +115,7 @@ img_cmd_off = pygame.transform.scale(img_cmd_off,(int(1.5/12*a*WINDOW_SIZE), int
 #         "Paste and Send","Click to Toggle","Send long strings (500 char)"\
 #         "© 2020 Laygond Github, Remote Hardware Access"]
 
+# Create Rectangles to Highlight over Options
 x,y,w,h = int(2.1/12*a*WINDOW_SIZE), int(2.6/12*WINDOW_SIZE), int(6.5/12*WINDOW_SIZE), int(2.5/12*WINDOW_SIZE)
 rectPower = pygame.Rect(x,y,w,h)  
 x,y,w,h = int(2.1/12*a*WINDOW_SIZE), int(5.1/12*WINDOW_SIZE), int(6.5/12*WINDOW_SIZE), int(2.5/12*WINDOW_SIZE)
@@ -118,6 +123,7 @@ rectKeyboard = pygame.Rect(x,y,w,h)
 x,y,w,h = int(2.1/12*a*WINDOW_SIZE), int(7.6/12*WINDOW_SIZE), int(6.5/12*WINDOW_SIZE), int(3/12*WINDOW_SIZE)
 rectCmd = pygame.Rect(x,y,w,h) 
 
+# Create Flags to know when an options should be highlighted & selected
 mouse_over_power = False
 mouse_over_keyboard = False
 mouse_over_cmd = False
@@ -129,6 +135,7 @@ hold_power = False
 timer_start = 0
 key_pressed = False
 
+# Draw Images and Texts based on Flags
 def redraw_main_menu():  
     win.blit(main_menu_bg, (0,0))  # This will draw our background image at (0,0)
     
@@ -166,8 +173,8 @@ def redraw_main_menu():
 
     pygame.display.update() 
 
-
-# ------------- MAIN CODE STARTS HERE -------------
+# Flags will now be evaluated
+# ------------- RUN LOOP STARTS HERE -------------
 run = True
 start_menu = True 
 while run:
@@ -177,11 +184,11 @@ while run:
     while start_menu:
         events = pygame.event.get()     #Collects Keyboard & Mouse Events 
         for event in events:
-            #If red X from window is clicked
+            # If red X from window is clicked then Quit program
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            #If mouse is clicked anywhere proceed to MAIN MENU
+            # If mouse is clicked anywhere proceed to MAIN MENU
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 start_menu = False
         redraw_start_menu()
@@ -190,11 +197,11 @@ while run:
     mouse_pos = pygame.mouse.get_pos()
     events = pygame.event.get()
     for event in events:
-        #If red X from window is clicked
+        # If red X from window is clicked then Quit program
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
-        #If power option is pressed then start timer
+        # If power option is 'pressed' (not clicked) then start timer and flag changes
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if rectPower.collidepoint(mouse_pos):   # if mouse within rect
                 timer_start = time.time()
@@ -202,7 +209,7 @@ while run:
                 click_power = False
                 click_keyboard = False
                 click_cmd = False
-        # if mouse is clicked over options
+        # if any three options are clicked then flag changes
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             hold_power = False          # Power has been released
             if rectPower.collidepoint(mouse_pos):
@@ -220,7 +227,7 @@ while run:
                     click_power = False
                     click_keyboard = False
                     click_cmd = False if click_cmd else True
-        # If keyboard is pressed
+        # If key in keyboard has been pressed then flag changes
         if event.type == pygame.KEYDOWN:
             key_pressed = True
 
@@ -229,7 +236,7 @@ while run:
         if time.time()- timer_start > 2.5:
             click_power = False
 
-    # If keyboard is selected and keys are pressed 
+    # If keyboard is selected and keys are pressed then send data to server 
     if click_keyboard and key_pressed:
         keys = pygame.key.get_pressed()
         msg = pickle.dumps(keys)
@@ -238,7 +245,7 @@ while run:
         client_socket.send(msg)
         key_pressed = False
 
-    # If mouse over options then display box
+    # If mouse pointer over options then display box
     if rectPower.collidepoint(mouse_pos):
         mouse_over_power = True
     else: 
@@ -252,6 +259,7 @@ while run:
     else: 
         mouse_over_cmd = False
 
+    # Based on Flags Draw Menu
     redraw_main_menu()
     
 pygame.quit()

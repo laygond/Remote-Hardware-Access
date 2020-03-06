@@ -10,7 +10,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 server_socket.bind((SERVER_IP, PORT))  # notifies os that it's going to use given IP and port.For a server using IP 0.0.0.0 means to listen on all available interfaces, useful to connect locally to 127.0.0.1 and remotely to LAN interface IP
-server_socket.listen(5)
+server_socket.listen(5)                # Can connect up to 5 clients at a time, leave blank for more than 1
 print(f'Listening for connections on Server {SERVER_IP}:{PORT}...')
 
 while True:
