@@ -25,8 +25,8 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 BOLD  = True
 HEADERSIZE = 10        # pre-allocates in header the length of msg: max (10 digit number)
-SERVER_IP  = "10.0.0.7"#socket.gethostname()
-PORT       = 1243      # (+1000 Recommended) Must match with server port
+SERVER_IP  = "raspberrypi"#socket.gethostname()
+PORT       = 2383      # (+1000 Recommended) Must match with server port
 
 
 # ---------------- INITIAL SETUP -----------------
@@ -43,7 +43,7 @@ pygame.display.set_caption("Remote Hardware Access")
 # There are two levels in our display program: the start menu & the main menu
 #--------------- START MENU WINDOW SETUP------------
 # Load Images 
-start_menu_bg = pygame.image.load(os.path.join("images","rha_intro2.PNG"))
+start_menu_bg = pygame.image.load(os.path.join("images","rha_intro2.png"))
 start_menu_bg = pygame.transform.scale(start_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
 
 # Load Texts
@@ -80,32 +80,32 @@ def redraw_start_menu():
 main_menu_bg = pygame.image.load(os.path.join("images","rha_intro3.JPG"))
 main_menu_bg = pygame.transform.scale(main_menu_bg,(WINDOW_SIZE,WINDOW_SIZE))
 
-img_power_on = pygame.image.load(os.path.join("images","rha_power_on.PNG"))
+img_power_on = pygame.image.load(os.path.join("images","rha_power_on.png"))
 w,h = img_power_on.get_size()
 a = w/h      #aspect ratio
 img_power_on = pygame.transform.scale(img_power_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-img_power_off = pygame.image.load(os.path.join("images","rha_power_off2.PNG"))
+img_power_off = pygame.image.load(os.path.join("images","rha_power_off2.png"))
 w,h = img_power_off.get_size()
 a = w/h      #aspect ratio
 img_power_off = pygame.transform.scale(img_power_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-img_keyboard_on = pygame.image.load(os.path.join("images","rha_keyboard_on2.PNG"))
+img_keyboard_on = pygame.image.load(os.path.join("images","rha_keyboard_on2.png"))
 w,h = img_keyboard_on.get_size()
 a = w/h      #aspect ratio
 img_keyboard_on = pygame.transform.scale(img_keyboard_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-img_keyboard_off = pygame.image.load(os.path.join("images","rha_keyboard_off2.PNG"))
+img_keyboard_off = pygame.image.load(os.path.join("images","rha_keyboard_off2.png"))
 w,h = img_keyboard_off.get_size()
 a = w/h      #aspect ratio
 img_keyboard_off = pygame.transform.scale(img_keyboard_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-img_cmd_on = pygame.image.load(os.path.join("images","rha_cmd_on.PNG"))
+img_cmd_on = pygame.image.load(os.path.join("images","rha_cmd_on.png"))
 w,h = img_cmd_on.get_size()
 a = w/h      #aspect ratio
 img_cmd_on = pygame.transform.scale(img_cmd_on,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))
 
-img_cmd_off = pygame.image.load(os.path.join("images","rha_cmd_off2.PNG"))
+img_cmd_off = pygame.image.load(os.path.join("images","rha_cmd_off2.png"))
 w,h = img_cmd_off.get_size()
 a = w/h      #aspect ratio
 img_cmd_off = pygame.transform.scale(img_cmd_off,(int(1.5/12*a*WINDOW_SIZE), int(1.5/12*WINDOW_SIZE)))

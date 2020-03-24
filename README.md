@@ -28,5 +28,5 @@ Install ...
 * USB Serial comunnication
 * Remote Access
 * Menu option in Pygame
-* Socket Client & Sever
+* [Socket Client & Sever](https://docs.python.org/3/howto/sockets.html)
 * Device Tree Overlays
