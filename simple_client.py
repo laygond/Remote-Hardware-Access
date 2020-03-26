@@ -13,9 +13,9 @@ ap.add_argument("-p","--port", required=True,
 args = vars(ap.parse_args())
 
 # ------------- CONSTANTS -------------------
-HEADERSIZE = 10        		# pre-allocates in header the length of msg: max (10 digit number)
-SERVER_IP  = args["server"] # socket.gethostname() assigns a 127.0.0. address equivalent in the background
-PORT       = args["port"]   # (+1024 Recommended) Must match with server port
+HEADERSIZE = 10        		   # pre-allocates in header the length of msg: max (10 digit number)
+SERVER_IP  = args["server"]    # socket.gethostname() assigns a 127.0.0. address equivalent in the background
+PORT       = int(args["port"]) # (+1024 Recommended) Must match with server port
 
 # ---------------- INITIAL SETUP -----------------
 # Create Client
