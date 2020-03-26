@@ -1,3 +1,6 @@
+# USAGE
+#python3 client.py -s 10.0.0.7 -p 9000 
+
 import pickle
 import socket
 import time
@@ -5,6 +8,26 @@ import struct
 import os
 import pygame
 from pygame.locals import *      #Enhances keybord inputs "apparently"
+import argparse
+
+ap=argparse.ArgumentParser()
+ap.add_argument("-s","--server", required=True,
+    help="server ip address or hostname" )
+ap.add_argument("-p","--port", required=True,
+	help="port number, it must match with server port" )
+args = vars(ap.parse_args())
+
+
+# ---------------- CONSTANTS -------------------
+WINDOW_SIZE = 400  
+BOX_THICKNESS = 3
+BLUE  = (0,0,255)  
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+BOLD  = True
+HEADERSIZE = 10             # pre-allocates in header the length of msg: max (10 digit number)
+SERVER_IP  = args["server"] # socket.gethostname() assigns a 127.0.0. address equivalent in the background
+PORT       = args["port"]   # (+1024 Recommended) Must match with server port
 
 
 def create_text(text, font_size, bold, text_color):
@@ -16,17 +39,6 @@ def create_text(text, font_size, bold, text_color):
     surface =  myfont.render(text,True,text_color)
     return surface 
 
-
-# ---------------- CONSTANTS -------------------
-WINDOW_SIZE = 400  
-BOX_THICKNESS = 3
-BLUE  = (0,0,255)  
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-BOLD  = True
-HEADERSIZE = 10        # pre-allocates in header the length of msg: max (10 digit number)
-SERVER_IP  = "raspberrypi"#socket.gethostname()
-PORT       = 2383      # (+1000 Recommended) Must match with server port
 
 
 # ---------------- INITIAL SETUP -----------------

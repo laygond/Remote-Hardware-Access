@@ -1,10 +1,22 @@
-import socket
+# USAGE
+#python3 simple_server.py -s 10.0.0.7 -p 9000 
+
 import pickle
+import socket
+import argparse
+
+ap=argparse.ArgumentParser()
+ap.add_argument("-s","--server", required=True,
+    help="server ip address or hostname" )
+ap.add_argument("-p","--port", required=True,
+	help="port number, it must mtch with client port" )
+args = vars(ap.parse_args())
 
 # ------------- CONSTANTS -------------------
-HEADERSIZE = 10        # pre-allocates in header the length of msg: max (10 digit number)
-SERVER_IP  = socket.gethostname()
-PORT       = 2383      # (+1000 Recommended) Must match with client port
+HEADERSIZE = 10        		# pre-allocates in header the length of msg: max (10 digit number)
+BATCHSIZE  = 512            # read incoming data in chunks of this size
+SERVER_IP  = args["server"] # socket.gethostname() assigns a 127.0.0. address equivalent in the background
+PORT       = args["port"]   # (+1024 Recommended) Must match with client port
 
 # ---------------- INITIAL SETUP -----------------
 # Create Server
@@ -26,7 +38,7 @@ while True:
         full_msg = b''
         new_msg = True
         while True:
-            msg = client_socket.recv(512)   #freezes here until it receives from client, When a recv returns 0 bytes, it means the other side has closed
+            msg = client_socket.recv(BATCHSIZE)   #freezes here until it receives from client, When a recv returns 0 bytes, it means the other side has closed
             if new_msg:
                 print("new msg len:",msg[:HEADERSIZE])
                 msglen = int(msg[:HEADERSIZE])
