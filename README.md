@@ -94,10 +94,32 @@ $ python3 client.py -s <Pi_IP_address> -p <Server_Port>
 $ python3 client.py -s <NetworkB_Public_IP_address> -p <Server_Port>
 ```
 
-
 # EXTRA
-## How to set server to send its Network Public IP to your email weekly
-Under `tools` there is `weekly_emails.py`. Open the file and set the proper changes whether you are using a Google or Microsoft email account. To run this file along with server.py the python scripts must run in parallel. To do this...
+## How to set server to send its Network Public IP
+I have included two options one via email and the other using a private repo in github as a storage space.
+
+For the email version there are two files under `tools`:
+`send_email.py` and `email_IP.sh`. Open the files and set the proper changes whether you are using a Google or Microsoft email account. 
+
+For the Github version there a couple of preliminary steps. Create a private github repo and then remove the need to type username and password by [setting the remote url as SSH](https://steadylearner.com/blog/read/How-to-automatically-commit-files-to-GitHub-with-Python). 
+```
+$ git remote set-url origin git@github.com:<Username>/<Project>.git
+```
+For this you will also need an SSH key. [Mike Levin covers the SSH key procedure.](https://www.youtube.com/watch?v=6oTzYnQY17Q)
+```
+$ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+Once this is complete you are ready to use under `tools` a shell file: `commit_IP.sh`. Open the file and set the proper changes.
+
+Now, to run any or both of these versions along with `server.py` the python scripts must run in parallel. To do this we will need the help of crontab.
+```
+$ sudo crontab -e
+```
+This command will open an editor. Set a weekly routine to receive your public IP by adding:
+```
+0 5 * * 6 source <path_to_commit_IP.sh> <my_log_file.txt>
+```
+This sends your public IP to Github every Saturday at 5 AM. For Reference: `minute(0-59) hour(0-23) day(1-31) month(1-12) weekday(0-6) command`
 
 
 ## Alternative Hardware Configurations
