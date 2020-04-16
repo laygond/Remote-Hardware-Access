@@ -5,15 +5,17 @@
 # $ sudo chmod +x commit_IP.sh
 # $ source commit_IP.sh <my_log_file.txt>
 
-today=$(date "+%Y-%m-%d-%T")
+repo_path=<insert_repo_path> # ~/LAYGOND_GITHUB/my_public_ip_repo
+log_file=$repo_path/$1
+today=$(date "+%Y-%m-%d/%T")
 public_IP=$(lynx -dump http://checkip.dyndns.org/ | cut -d':' -f2) 
 
-while [ $(wc -l $1 | cut -d' ' -f1) -gt 52 ] # keep last 52 weeks 
+while [ $(wc -l $log_file | cut -d' ' -f1) -gt 52 ] # keep last 52 weeks 
 do #delete first line
-  sudo sed -i '1d' $1
+  sudo sed -i '1d' $log_file
 done
-sudo sed -i "$ a $today $public_IP" ~/LAYGOND_GITHUB/Public-IP-Log/$1
+sudo sed -i "$ a $today $public_IP" $log_file
 
-sudo git add -A
-sudo git commit -m ":loud_sound: update public IP"
-sudo git push 
+sudo git -C $repo_path add .
+sudo git -C $repo_path commit -m ":loud_sound: update public IP"
+git -C $repo_path push
